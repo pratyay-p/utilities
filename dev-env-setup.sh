@@ -1,8 +1,9 @@
 #!/bin/bash
 
+echo Check the script and remove this line...
+exit 1 
 echo -------- Checking if GNU Make exists: $(which make 2>/dev/null || echo No... Bailing since further builds will fail.)
-
-SB_DIR=/export/users/$USER
+SB_DIR=$HOME
 INSTALL_DIR=$SB_DIR/.local
 LOG_DIR=$SB_DIR/.logs
 
