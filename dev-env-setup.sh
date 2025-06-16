@@ -104,12 +104,19 @@ nvim_location=$(which nvim)
 #
 # Installation of postgresql
 
-wget https://ftp.postgresql.org/pub/source/v17.5/postgresql-17.5.tar.gz
-tar -xf postgresql-17.5.tar.gz
-cd postgresql-17.5
+  wget https://ftp.postgresql.org/pub/source/v17.5/postgresql-17.5.tar.gz
+  tar -xf postgresql-17.5.tar.gz
+  cd postgresql-17.5
 
- CC=clang CFLAGS="-O3 -mtune=sapphirerapids" CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" ./configure --prefix=/export/users/pratyayp/.local/postgresql --with-llvm --without-readline
+  CC=clang CFLAGS="-O3 -mtune=sapphirerapids" CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" ./configure --prefix=/export/users/pratyayp/.local/postgresql --with-llvm --without-readline --with-openssl
 
- make -j$(nproc) all
- make -j$(nproc) check 
- make -j$(nproc) install
+  make -j$(nproc) all
+  make -j$(nproc) check 
+  make -j$(nproc) install
+
+  git clone https://github.com/timescale/timescaledb timescaledb-src
+  cd timescaledb-src
+  git checkout 2.20.3
+   CC=clang CXX=clang CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./bootstrap --install-prefix=/export/users/pratyayp/.local/timescaledb -G Ninja
+   cmake --build ./build --parallel $(nproc)
+   cmake --install ./build
