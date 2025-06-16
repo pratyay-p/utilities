@@ -3,7 +3,7 @@
 echo Check the script and remove this line...
 exit 1 
 echo -------- Checking if GNU Make exists: $(which make 2>/dev/null || echo No... Bailing since further builds will fail.)
-SB_DIR=$HOME
+SB_DIR=/export/users/$USER
 INSTALL_DIR=$SB_DIR/.local
 LOG_DIR=$SB_DIR/.logs
 
@@ -101,3 +101,15 @@ nvim_location=$(which nvim)
 # else
 	echo ---- Nothing to Install
 # fi
+#
+# Installation of postgresql
+
+wget https://ftp.postgresql.org/pub/source/v17.5/postgresql-17.5.tar.gz
+tar -xf postgresql-17.5.tar.gz
+cd postgresql-17.5
+
+ CC=clang CFLAGS="-O3 -mtune=sapphirerapids" CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" ./configure --prefix=/export/users/pratyayp/.local/postgresql --with-llvm --without-readline
+
+ make -j$(nproc) all
+ make -j$(nproc) check 
+ make -j$(nproc) install
