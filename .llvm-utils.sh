@@ -291,25 +291,38 @@ function llvm_install_debug() {
 
 function llvm_local_install() {
     # Clone the repository
-    git clone https://github.com/pratyay-p/llvm-project.git llvm-src
+    git clone https://github.com/llvm/llvm-project.git llvm-src
     cd llvm-src
+    git checkout llvmorg-20.1.7
     export my_workspace_dir="$(pwd)"
 
-    # Run the CMake command
+    # Run the CMake command for clang
     cmake -G 'Unix Makefiles' -B "$my_workspace_dir/build/Release" -S "$my_workspace_dir/llvm" \
+        -DCMAKE_C_COMPILER=`which gcc` \
+        -DCMAKE_CXX_COMPILER=`which g++` \
         -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-        -DCMAKE_INSTALL_PREFIX="$HOME/.local/llvm" \
-        -DLLVM_ENABLE_PROJECTS="clang;lld;clang-tools-extra" \
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=OFF \
+        -DCMAKE_INSTALL_PREFIX="/export/users/pratyayp/.local/llvm" \
+        -DLLVM_ENABLE_PROJECTS="clang;lld;openmp;clang-tools-extra" \
         -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind;compiler-rt" \
-        -DCMAKE_C_FLAGS="-O3" \
-        -DCMAKE_CXX_FLAGS="-O3" \
-        -DLLVM_ENABLE_ASSERTIONS=ON \
-        -DBUILD_SHARED_LIBS=ON \
-        -DLLVM_TARGETS_TO_BUILD="X86" \
+        -DCMAKE_C_FLAGS="-O3 -mtune=sapphirerapids" \
+        -DCMAKE_CXX_FLAGS="-O3 -mtune=sapphirerapids" \
+        -DLLVM_ENABLE_ASSERTIONS=OFF \
+        -DLLVM_BUILD_LLVM_DYLIB=ON \
+        -DLLVM_TARGETS_TO_BUILD="AMDGPU;NVPTX;X86" \
+        -DLLVM_INCLUDE_BENCHMARKS=0 \
+        -DLLVM_INCLUDE_EXAMPLES=0 \
+        -DLLVM_INCLUDE_TESTS=0 \
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON \
+        -DCMAKE_INSTALL_RPATH="/export/users/pratyayp/.local/llvm/lib" \
+        -DLLVM_ENABLE_OCAMLDOC=OFF \
+        -DLLVM_ENABLE_BINDINGS=OFF \
+        -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=OFF \
         -DLLVM_PARALLEL_COMPILE_JOBS=$parallel_compile_job_num \
         -DLLVM_PARALLEL_LINK_JOBS=$parallel_link_job_num \
-        -DLLVM_OPTIMIZED_TABLEGEN=TRUE
+        -DLLVM_OPTIMIZED_TABLEGEN=TRUE \
+        -DOPENMP_ENABLE_LIBOMPTARGET=OFF \
+        -DLLVM_ENABLE_DUMP=OFF
 
     # run the compilation command
     cmake --build "$my_workspace_dir/build/Release" --parallel $(nproc)
@@ -381,6 +394,31 @@ function llvm_setenv_release() {
 
 }
 
+function llvm_local_intel_install() {
+    wget https://github.com/intel/llvm/releases/download/v6.1.0/linux-sycl-6.1.0.tar.gz
+    tar -xf linux-sycl-6.1.0.tar.gz
+
+
+    git clone https://github.com/intel/llvm.git -b sycl intel-llvm
+    export DPCPP_HOME="$(pwd)"
+    cd intel-llvm
+    git checkout v6.1.0
+    python3 $DPCPP_HOME/intel-llvm/buildbot/configure.py \
+        --shared-libs \
+        -o $DPCPP_HOME/intel-llvm/build \
+        -t "Release" \
+        --cmake-gen "Ninja" \
+        --cmake-opt "-DCMAKE_EXPORT_COMPILE_COMMANDS=OFF \
+                     -DCMAKE_VERBOSE_MAKEFILE=ON \
+                     -DCMAKE_INSTALL_PREFIX=\"/export/users/pratyayp/.local/llvm\" \
+                     -DLLVM_ENABLE_RUNTIMES=\"libcxx;libcxxabi;libunwind;compiler-rt\" \
+                     -DCMAKE_C_FLAGS=\"-O3 -mtune=sapphirerapids\" \
+                     -DCMAKE_CXX_FLAGS=\"-O3 -mtune=sapphirerapids\" \
+                     -DLLVM_OPTIMIZED_TABLEGEN=ON \
+                     -DLLVM_USE_STATIC_ZSTD=OFF " \
+        --llvm-external-projects "clang,lld,openmp,clang-tools-extra"
+    python3 $DPCPP_HOME/intel-llvm/buildbot/compile.py -o $DPCPP_HOME/intel-llvm/build --build-parallelism $(nproc)
+}
 
 export llvm_install_release_x86
 export llvm_configure_release_x86
@@ -395,3 +433,7 @@ export llvm_configure_release_all
 
 export llvm_setenv_debug
 export llvm_setenv_release
+export llvm_local_intel_install
+
+
+

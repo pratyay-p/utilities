@@ -102,13 +102,21 @@ nvim_location=$(which nvim)
 	echo ---- Nothing to Install
 # fi
 #
+
+# Installation of liblz4
+git clone https://github.com/lz4/lz4.git lz4-src
+cd lz4-src
+git checkout v1.10.0
+make -j$(nproc) CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" PREFIX=/export/users/pratyayp/.local/lz4
+make -j$(nproc) CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" PREFIX=/export/users/pratyayp/.local/lz4 install
+
 # Installation of postgresql
 
   wget https://ftp.postgresql.org/pub/source/v17.5/postgresql-17.5.tar.gz
   tar -xf postgresql-17.5.tar.gz
   cd postgresql-17.5
 
-  CC=clang CFLAGS="-O3 -mtune=sapphirerapids" CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" ./configure --prefix=/export/users/pratyayp/.local/postgresql --with-llvm --without-readline --with-openssl
+  CC=clang CFLAGS="-O3 -mtune=sapphirerapids" CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" ./configure --prefix=/export/users/pratyayp/.local/postgresql --with-llvm --without-readline --with-openssl --with-lz4
 
   make -j$(nproc) all
   make -j$(nproc) check 
@@ -120,3 +128,58 @@ nvim_location=$(which nvim)
    CC=clang CXX=clang CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./bootstrap --install-prefix=/export/users/pratyayp/.local/timescaledb -G Ninja
    cmake --build ./build --parallel $(nproc)
    cmake --install ./build
+
+# Installation of boost libraries
+wget https://archives.boost.io/release/1.63.0/source/boost_1_63_0.tar.gz
+tar -xf boost_1_63_0.tar.gz
+cd boost_1_63_0/tools/build/
+./bootstrap.sh
+CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./b2 --prefix=/export/users/pratyayp/.local/boost-b2
+export PATH="/export/users/pratyayp/.local/boost-b2/bin:$PATH"
+cd ../..
+CC=clang CXX=clang CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" b2 --prefix=/export/users/pratyayp/.local/boost --build-dir=$PWD/builds
+CC=clang CXX=clang CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" b2 --prefix=/export/users/pratyayp/.local/boost --build-dir=$PWD/builds install
+
+# Install AdaptiveCpp - DON'T
+git clone https://github.com/AdaptiveCpp/AdaptiveCpp.git adaptivecpp-src
+cd adaptivecpp-src
+git checkout v25.02.0
+cmake -G "Ninja" -B build \
+    -DCMAKE_C_COMPILER=clang \
+    -DCMAKE_CXX_COMPILER=clang++ \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+    -DCMAKE_INSTALL_PREFIX="/export/users/pratyayp/.local/adaptivecpp" \
+    -DBUILD_SHARED_LIBS=ON \
+    -DUSE_EXTERNAL_LLVM=ON \
+    -DLLVM_DIR="/export/users/pratyayp/.local/llvm/lib/cmake/llvm" \
+    -DCLANG_DIR="/export/users/pratyayp/.local/llvm/bin/clang" \
+    -DCLANG_INCLUDE_PATH="/export/users/pratyayp/.local/llvm/lib/clang/20/include" \
+    -DBOOST_ROOT=$BOOST_ROOT
+
+ cmake -G "Ninja" -B build 
+    -DCMAKE_C_COMPILER=clang \
+    -DCMAKE_CXX_COMPILER=clang++ \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+    -DCMAKE_INSTALL_PREFIX="/export/users/pratyayp/.local/adaptivecpp" \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_PREFIX_PATH="/export/users/pratyayp/.local/openmp" \
+    -DOpenMP_C_FLAGS="-fopenmp -I/export/users/pratyayp/.local/openmp/include" \
+    -DOpenMP_C_LIB_NAMES="omp" \
+    -DOpenMP_omp_LIBRARY="/export/users/pratyayp/.local/openmp/lib/libomp.so" \
+    -DOpenMP_CXX_FLAGS="-fopenmp -I/export/users/pratyayp/.local/openmp/include" \
+    -DOpenMP_CXX_LIB_NAMES="omp" \
+    -DOpenMP_omp_LIBRARY_RELEASE="/export/users/pratyayp/.local/openmp/lib/libomp.so" \
+    -DBOOST_ROOT=$BOOST_ROOT
+
+ cmake --build build --parallel -j$(nproc)
+ cmake --install build
+
+git clone https://github.com/facebook/zstd.git zstd-src
+cd zstd-src/
+git checkout v1.5.7
+ls
+cmake -B build -S build/cmake -G Ninja -DCMAKE_BUILD_TYPE="Release" -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="/export/iusers/pratyayp/.local/zstd" -DCMAKE_C_FLAGS="-O3 -mtune=sapphirerapids" -DCMAKE_CXX_FLAGS="-O3 -mtune=sapphirerapids"
+cmake --build build --parallel -j$(nproc)
+
