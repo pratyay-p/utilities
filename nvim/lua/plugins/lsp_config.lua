@@ -27,7 +27,7 @@ local function get_lang_server_details()
   -- install an LSP using brew and list it here
   return {
     -- lsp with specific config
-    lua_ls = { settings = lua_lsp_settings },
+    -- lua_ls = { settings = lua_lsp_settings },
     clangd = { on_attach = SetupClangExtn },
     -- lsp with generic config (includes auto-complete ability)
     pyright = {},
@@ -42,6 +42,11 @@ function SetupLangServers(lspconfig)
     -- Autocomplete capabilities are added to all servers by default
     config.capabilities = lsp_autocmp_capabilites
     lspconfig[server].setup(config)
+    -- Following is a command that works with versions 0.11.4 and beyond. Some functionality 
+    -- in lspconfig is deprecated and using the above line will cause errors. If moving to 
+    -- a newer version, comment out the last line and uncomment the next 2 lines
+    -- vim.lsp.config[server] = config
+    -- vim.lsp.enable(server)
   end
 end
 
