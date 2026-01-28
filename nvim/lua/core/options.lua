@@ -6,14 +6,16 @@ vim.opt.autowrite = true
 vim.opt.cursorline = true
 vim.opt.autoread = true
 
-vim.opt.tabstop = 2
-vim.opt.shiftwidth = 2
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
 vim.opt.shiftround = true
 vim.opt.expandtab = true
 
-vim.opt.undofile = true -- Persistent undo's across all sessions
+vim.opt.undofile = false -- Disable undo across sessions - sometimes makes nvim crash
+vim.opt.swapfile = false -- Disable creation of swap files
 vim.opt.backup = false -- Don't write backups. (For better performance)
 vim.opt.writebackup = false -- Don't write backups.
+vim.opt.shadafile = "NONE" -- Disable ShaDa
 vim.opt.autoindent = true -- Copy indent from the current line when starting a new line
 vim.opt.breakindent = true -- Indent wrapped lines too.
 vim.opt.copyindent = true -- Copy the structure of the existing lines' indents.
