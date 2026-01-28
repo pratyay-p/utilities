@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo Check the script and remove this line...
-exit 1 
+# echo Check the script and remove this line...
+# exit 1 
 echo -------- Checking if GNU Make exists: $(which make 2>/dev/null || echo No... Bailing since further builds will fail.)
 SB_DIR=/export/users/$USER
 INSTALL_DIR=$SB_DIR/.local
@@ -17,7 +17,7 @@ ninja_location=$(which ninja)
 # echo -------- Checking if clang exists: $(which nvim 2>/dev/null || echo No... neovim will be installed.)
 nvim_location=$(which nvim)
 
-# if [ ! -f "$clang_location" ]; then
+ if [ ! -f "$clang_location" ]; then
 	echo ---- Setting up clang ----
 
 	echo -------- Cloning llvm ...
@@ -27,16 +27,16 @@ nvim_location=$(which nvim)
 	
 	echo -------- Configuring LLVM. Projects: clang and lld. This will take almost 5 minutes...
 	cmake -G 'Unix Makefiles' -B $PWD/build/Release -S $PWD/llvm \
-		-DCMAKE_BUILD_TYPE=Release               \
-		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON       \
-		-DCMAKE_INSTALL_PREFIX=$INSTALL_DIR/llvm \
-		-DLLVM_ENABLE_PROJECTS="clang;lld"       \
-		-DLLVM_ENABLE_ASSERTIONS=ON              \
-		-DBUILD_SHARED_LIBS=ON                   \
-		-DLLVM_TARGETS_TO_BUILD="X86"            \
-		-DLLVM_PARALLEL_COMPILE_JOBS=80          \
-		-DLLVM_PARALLEL_LINK_JOBS=8              \
-		-DLLVM_OPTIMIZED_TABLEGEN=TRUE           \
+		-DCMAKE_BUILD_TYPE=Release                           \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON                   \
+		-DCMAKE_INSTALL_PREFIX=$INSTALL_DIR/llvm             \
+		-DLLVM_ENABLE_PROJECTS="clang;lld;clang-tools-extra" \
+		-DLLVM_ENABLE_ASSERTIONS=ON                          \
+		-DBUILD_SHARED_LIBS=ON                               \
+		-DLLVM_TARGETS_TO_BUILD="X86"                        \
+		-DLLVM_PARALLEL_COMPILE_JOBS=80                      \
+		-DLLVM_PARALLEL_LINK_JOBS=8                          \
+		-DLLVM_OPTIMIZED_TABLEGEN=TRUE                       \
 		2>&1 > $LOG_DIR/cmake-configure-llvm.log
 	
 	echo -------- Compiling LLVM: clang and lld. This will take almost 15-20 minutes...
@@ -47,7 +47,7 @@ nvim_location=$(which nvim)
 	
 	cd $SB_DIR
 	echo ---- Done installing clang
-
+fi
 # elif [ ! -f "$ninja_location" ]; then
 	echo ---- Setting up ninja
 
@@ -108,7 +108,7 @@ wget https://ftp.postgresql.org/pub/source/v17.5/postgresql-17.5.tar.gz
 tar -xf postgresql-17.5.tar.gz
 cd postgresql-17.5
 
- CC=clang CFLAGS="-O3 -mtune=sapphirerapids" CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" ./configure --prefix=/export/users/pratyayp/.local/postgresql --with-llvm --without-readline
+ CC=clang CFLAGS="-O3 -mtune=sapphirerapids" CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" ./configure --prefix=/export/users/pratyayp/.local/postgresql --with-llvm --without-readline --with-python
 
  make -j$(nproc) all
  make -j$(nproc) check 
