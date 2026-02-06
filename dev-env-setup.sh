@@ -145,12 +145,13 @@ cmake --install ./build
 cd $SB_DIR
 
 # Installation of boost libraries
-wget https://archives.boost.io/release/1.63.0/source/boost_1_63_0.tar.gz
-tar -xf boost_1_63_0.tar.gz
-cd boost_1_63_0/tools/build/
-./bootstrap.sh
-CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./b2 --prefix=/export/users/pratyayp/.local/boost-b2
-export PATH="/export/users/pratyayp/.local/boost-b2/bin:$PATH"
-cd ../..
-CC=clang CXX=clang CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" b2 --prefix=/export/users/pratyayp/.local/boost --build-dir=$PWD/builds
-CC=clang CXX=clang CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" b2 --prefix=/export/users/pratyayp/.local/boost --build-dir=$PWD/builds install
+wget https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz
+tar -xf boost_1_84_0.tar.gz
+cd boost_1_84_0/
+CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./bootstrap.sh --prefix=/export/users/pratyayp/.local/boost-b2
+
+# CC=clang CXX=clang CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./b2 --prefix=/export/users/pratyayp/.local/boost toolset=clang variant=release link=shared threading=multi --cmakedir=/export/users/pratyayp/.local/boost/cmake
+CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./b2 --prefix=/export/users/pratyayp/.local/boost toolset=clang variant=release link=shared threading=multi --cmakedir=/export/users/pratyayp/.local/boost/cmake --with-system
+CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./b2 --prefix=/export/users/pratyayp/.local/boost toolset=clang variant=release link=shared threading=multi --cmakedir=/export/users/pratyayp/.local/boost/cmake --with-system build
+CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./b2 --prefix=/export/users/pratyayp/.local/boost toolset=clang variant=release link=shared threading=multi --cmakedir=/export/users/pratyayp/.local/boost/cmake --with-system install
+
