@@ -3,7 +3,7 @@
 # echo Check the script and remove this line...
 # exit 1 
 echo -------- Checking if GNU Make exists: $(which make 2>/dev/null || echo No... Bailing since further builds will fail.)
-SB_DIR=/export/users/$USER
+SB_DIR=$H
 INSTALL_DIR=$SB_DIR/.local
 LOG_DIR=$SB_DIR/.logs
 
@@ -104,8 +104,8 @@ cd $SB_DIR
 git clone https://github.com/lz4/lz4.git lz4-src
 cd lz4-src
 git checkout v1.10.0
-make -j$(nproc) CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" PREFIX=/export/users/pratyayp/.local/lz4
-make -j$(nproc) CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" PREFIX=/export/users/pratyayp/.local/lz4 install
+make -j$(nproc) CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" PREFIX=$INSTALL_DIR/lz4
+make -j$(nproc) CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" PREFIX=$INSTALL_DIR/lz4 install
 
 cd $SB_DIR
 
@@ -115,7 +115,7 @@ git clone https://github.com/facebook/zstd.git zstd-src
 cd zstd-src
 git checkout v1.5.7
 
-cmake -B build -S build/cmake -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE="Release" -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="/export/iusers/pratyayp/.local/zstd" -DCMAKE_C_FLAGS="-O3 -mtune=sapphirerapids" -DCMAKE_CXX_FLAGS="-O3 -mtune=sapphirerapids"
+cmake -B build -S build/cmake -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE="Release" -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR/zstd" -DCMAKE_C_FLAGS="-O3 -mtune=sapphirerapids" -DCMAKE_CXX_FLAGS="-O3 -mtune=sapphirerapids"
 cmake --build build --parallel -j$(nproc)
 cmake --install build
 
@@ -127,7 +127,7 @@ wget https://ftp.postgresql.org/pub/source/v17.5/postgresql-17.5.tar.gz
 tar -xf postgresql-17.5.tar.gz
 cd postgresql-17.5
 
-CC=clang CFLAGS="-O3 -mtune=sapphirerapids" CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" ./configure --prefix=/export/users/pratyayp/.local/postgresql --with-llvm --without-readline --with-openssl --with-lz4
+CC=clang CFLAGS="-O3 -mtune=sapphirerapids" CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" ./configure --prefix=$INSTALL_DIR/postgresql --with-llvm --without-readline --with-openssl --with-lz4
 
 make -j$(nproc) all
 make -j$(nproc) check 
@@ -138,7 +138,7 @@ cd $SB_DIR
 git clone https://github.com/timescale/timescaledb timescaledb-src
 cd timescaledb-src
 git checkout 2.20.3
-CC=clang CXX=clang CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./bootstrap --install-prefix=/export/users/pratyayp/.local/timescaledb -G Ninja
+CC=clang CXX=clang CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./bootstrap --install-prefix=$INSTALL_DIR/timescaledb -G Ninja
 cmake --build ./build --parallel $(nproc)
 cmake --install ./build
 
@@ -148,10 +148,10 @@ cd $SB_DIR
 wget https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz
 tar -xf boost_1_84_0.tar.gz
 cd boost_1_84_0/
-CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./bootstrap.sh --prefix=/export/users/pratyayp/.local/boost-b2
+CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./bootstrap.sh --prefix=$INSTALL_DIR/boost-b2
 
-# CC=clang CXX=clang CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./b2 --prefix=/export/users/pratyayp/.local/boost toolset=clang variant=release link=shared threading=multi --cmakedir=/export/users/pratyayp/.local/boost/cmake
-CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./b2 --prefix=/export/users/pratyayp/.local/boost toolset=clang variant=release link=shared threading=multi --cmakedir=/export/users/pratyayp/.local/boost/cmake --with-system
-CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./b2 --prefix=/export/users/pratyayp/.local/boost toolset=clang variant=release link=shared threading=multi --cmakedir=/export/users/pratyayp/.local/boost/cmake --with-system build
-CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./b2 --prefix=/export/users/pratyayp/.local/boost toolset=clang variant=release link=shared threading=multi --cmakedir=/export/users/pratyayp/.local/boost/cmake --with-system install
+# CC=clang CXX=clang CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./b2 --prefix=$INSTALL_DIR/boost toolset=clang variant=release link=shared threading=multi --cmakedir=$INSTALL_DIR/boost/cmake
+CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./b2 --prefix=$INSTALL_DIR/boost toolset=clang variant=release link=shared threading=multi --cmakedir=$INSTALL_DIR/boost/cmake --with-system
+CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./b2 --prefix=$INSTALL_DIR/boost toolset=clang variant=release link=shared threading=multi --cmakedir=$INSTALL_DIR/boost/cmake --with-system build
+CC=clang CXX=clang++ CXXFLAGS="-O3 -mtune=sapphirerapids" CFLAGS="-O3 -mtune=sapphirerapids" ./b2 --prefix=$INSTALL_DIR/boost toolset=clang variant=release link=shared threading=multi --cmakedir=$INSTALL_DIR/boost/cmake --with-system install
 
