@@ -115,7 +115,7 @@ git clone https://github.com/facebook/zstd.git zstd-src
 cd zstd-src
 git checkout v1.5.7
 
-cmake -B build -S build/cmake -G Ninja -DCMAKE_BUILD_TYPE="Release" -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="/export/iusers/pratyayp/.local/zstd" -DCMAKE_C_FLAGS="-O3 -mtune=sapphirerapids" -DCMAKE_CXX_FLAGS="-O3 -mtune=sapphirerapids"
+cmake -B build -S build/cmake -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE="Release" -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="/export/iusers/pratyayp/.local/zstd" -DCMAKE_C_FLAGS="-O3 -mtune=sapphirerapids" -DCMAKE_CXX_FLAGS="-O3 -mtune=sapphirerapids"
 cmake --build build --parallel -j$(nproc)
 cmake --install build
 
